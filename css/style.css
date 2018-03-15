@@ -8,6 +8,38 @@ body {
   height: 60px;
 }
 
+.wrapper {
+  display: grid;
+  grid-gap: 4px;
+  grid-template-columns: 480px 200px;
+  width: 685px;
+  margin-top: 10px;
+  margin: auto;
+}
+
+.move-list {
+  background-color: #8395a7;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-radius: 0px 4px 4px 0px;
+  height: 484px;
+  overflow-y: scroll;
+}
+
+.future {
+  opacity: 0.3;
+}
+
+.notation {
+  background-color: #c8d6e5;
+  text-align: center;
+  color: #222f3e;
+}
+
+.notation:nth-child(odd) {
+  background-color: #8395a7;
+}
+
 .chessboard {
   display: grid;
   grid-gap: 0px;
@@ -15,10 +47,9 @@ body {
   grid-template-rows: repeat(8, 60px);
   background-color: #57606f;
   padding: 2px;
-  border-radius: 4px 4px 0 0;
+  border-radius: 4px 0px 0px 4px;
   width: 480px;
   margin: auto;
-  margin-top: 10px;
 }
 div.chessboard div {
   border-radius: 4px;

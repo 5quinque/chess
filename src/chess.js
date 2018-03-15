@@ -5,6 +5,13 @@ const Long = require('long');
 
 class Chess {
   constructor() {
+    Long.prototype.applyBit = this.applyBit;
+    Long.prototype.updateLong = this.updateLong;
+    Long.prototype.popBit = this.popBit;
+    Long.prototype.advancePawn = this.advancePawn;
+    Long.prototype.attackPawn = this.attackPawn;
+    Long.prototype.colour = 0;
+
     this.ply = 0;
 
     this.BlackRook = new Long(0, 0, true);
@@ -20,6 +27,20 @@ class Chess {
     this.WhiteKing = new Long(0, 0, true);
     this.WhitePawn = new Long(0, 0, true);
 
+    // 1 = black, 0 = white
+    this.BlackRook.colour = 1;
+    this.BlackKnight.colour = 1;
+    this.BlackBishop.colour = 1;
+    this.BlackQueen.colour = 1;
+    this.BlackKing.colour = 1;
+    this.BlackPawn.colour = 1;
+    this.WhiteRook.colour = 0;
+    this.WhiteKnight.colour = 0;
+    this.WhiteBishop.colour = 0;
+    this.WhiteQueen.colour = 0;
+    this.WhiteKing.colour = 0;
+    this.WhitePawn.colour = 0;
+
     // prettier-ignore
     const standardBoard = [
       'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r',
@@ -32,40 +53,111 @@ class Chess {
       'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R',
     ];
 
+    // prettier-ignore
+    const examplePawnArray = [
+      '0', '0', '0', '0', '0', '0', '0', '0',
+      '0', '0', '0', '0', '0', '0', '0', '0',
+      '0', '0', '0', '0', '0', '0', '0', '0',
+      '0', '0', '0', '0', '0', '0', '0', '0',
+      '0', '0', '0', '0', '0', '0', '0', '0',
+      '0', '0', '1', '0', '0', '0', '0', '0',
+      '1', '1', '0', '1', '0', '1', '1', '1',
+      '0', '0', '0', '0', '0', '0', '0', '0',
+    ];
+
+    this.examplePawn = this.arrayToBitboard(examplePawnArray);
+
     // Build our bitboards
-    this.arrayToBitboards(standardBoard);
+    this.arrayToChessBitboards(standardBoard);
     this.empty = new Long(0, 0);
 
     // This needs calling after every move
     this.getEmptyBitboard();
+
+    this.testing();
   }
 
   testing() {
     //console.log(typeof this.WhitePawn);
-    this.WhitePawn = this.popBit(this.WhitePawn);
-    this.printBitboard(this.WhitePawn);
+    //this.WhitePawn = this.popBit(this.WhitePawn);
+    //this.printBitboard(this.WhitePawn);
 
     //console.log(this.countBits(this.WhitePawn));
     //console.log(this.countBits(this.BlackRook));
     //this.printBitboard(this.empty);
 
-    //let colour;
     //console.log('White Pawn Advance 1');
-    //colour = 0;
-    //this.WhitePawn = this.advancePawn(this.WhitePawn, colour);
+    //this.printBitboard(this.WhitePawn);
+    //this.WhitePawn.advancePawn(this.empty);
     //this.printBitboard(this.WhitePawn);
 
-    //console.log('Black Pawn Advance 1');
-    //colour = 1;
-    //this.BlackPawn = this.advancePawn(this.BlackPawn, colour);
+    //let possibleBlackPawnMoves = this.BlackPawn.advancePawn(this.empty);
+    //console.log('Black Pawn Current');
     //this.printBitboard(this.BlackPawn);
+    //console.log('Black Pawn Advance 1');
+    //this.printBitboard(possibleBlackPawnMoves);
+
+    //let possibleWhitePawnMoves = this.WhitePawn.advancePawn(this.empty);
+    //console.log('White Pawn Current');
+    //this.printBitboard(this.WhitePawn);
+    //console.log('White Pawn Advance 1');
+    //this.printBitboard(possibleWhitePawnMoves);
     //
-    //console.log('Black Rook');
-    //this.printBitboard(this.BlackRook);
+
+    //console.log('White Pawn Current');
+    //this.printBitboard(this.WhitePawn);
+
+    //let pwAttack = this.WhitePawn.attackPawn(this.empty);
+    //console.log('White Pawn Attack');
+    //this.printBitboard(pwAttack);
+
+    console.log('cpw example pawns');
+    this.printBitboard(this.examplePawn);
+
+    let pwAttack = this.examplePawn.attackPawn(this.empty);
+    console.log('cpw example all attacks');
+    this.printBitboard(pwAttack);
+
+    //this.singlePush(this.WhitePawn);
   }
 
   /**
    *
+   * @description Advance a pawn bitboard by one row
+   */
+  attackPawn(empty) {
+    const notAFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
+    const notHFile = new Long(0xfefefefe, 0xfefefefe, true);
+
+    const east = this.shiftLeft(9)
+      .shiftRightUnsigned(this.colour << 4)
+      .and(empty)
+      .and(notHFile);
+
+    const west = this.shiftLeft(7)
+      .shiftRightUnsigned(this.colour << 4)
+      .and(empty)
+      .and(notAFile);
+
+    return east.or(west);
+  }
+
+  /**
+   *
+   * @description Move a single target forward
+   */
+  //singlePush(bitboard) {
+  //const rank3 = new Long(0x00000000ff000000, 0, true);
+
+  ////rank3.shiftLeft(5);
+
+  //this.printBitboard(rank3);
+  //console.log(rank3.toString());
+  //}
+
+  /**
+   *
+   * [TODO] return the index of the popped bit?
    * @description Pop the least significant bit
    */
   popBit(bitboard) {
@@ -87,11 +179,10 @@ class Chess {
    *
    * @description Advance a pawn bitboard by one row
    */
-  advancePawn(pawns, colour) {
-    return pawns
-      .shiftLeft(8)
-      .shiftRightUnsigned(colour << 4)
-      .and(this.empty);
+  advancePawn(empty) {
+    return this.shiftLeft(8)
+      .shiftRightUnsigned(this.colour << 4)
+      .and(empty);
   }
 
   /**
@@ -148,55 +239,79 @@ class Chess {
 
   /**
    *
-   *
+   * @description apply a bit on out bitboard
    */
-  arrayToBitboards(boardArray) {
-    let oneBit;
+  applyBit(bit) {
+    const tempLong = this.xor(bit);
+    this.updateLong(tempLong);
+  }
+
+  arrayToBitboard(array) {
+    let tempLong = new Long(0, 0, true);
+    let bit;
+
+    array.reverse();
+
+    for (let i = 0; i < array.length; i++) {
+      bit = new Long(1, 0, true).shiftLeft(i);
+
+      if (array[i] === '1') {
+        tempLong.applyBit(bit);
+      }
+    }
+
+    return tempLong;
+  }
+
+  /**
+   *
+   * @description Build all our bitboards
+   */
+  arrayToChessBitboards(boardArray) {
+    let piece;
     boardArray.reverse();
 
     for (let i = 0; i < boardArray.length; i++) {
-      oneBit = new Long(1, 0);
-      oneBit = oneBit.shiftLeft(i);
+      piece = new Long(1, 0).shiftLeft(i);
 
+      // prettier-ignore
       switch (boardArray[i]) {
-        case 'r':
-          this.BlackRook = this.BlackRook.xor(oneBit);
+        case 'r': this.BlackRook.applyBit(piece);
           break;
-        case 'n':
-          this.BlackKnight = this.BlackKnight.xor(oneBit);
+        case 'n': this.BlackKnight.applyBit(piece);
           break;
-        case 'b':
-          this.BlackBishop = this.BlackBishop.xor(oneBit);
+        case 'b': this.BlackBishop.applyBit(piece);
           break;
-        case 'q':
-          this.BlackQueen = this.BlackQueen.xor(oneBit);
+        case 'q': this.BlackQueen.applyBit(piece);
           break;
-        case 'k':
-          this.BlackKing = this.BlackKing.xor(oneBit);
+        case 'k': this.BlackKing.applyBit(piece);
           break;
-        case 'p':
-          this.BlackPawn = this.BlackPawn.xor(oneBit);
+        case 'p': this.BlackPawn.applyBit(piece);
           break;
-        case 'R':
-          this.WhiteRook = this.WhiteRook.xor(oneBit);
+        case 'R': this.WhiteRook.applyBit(piece);
           break;
-        case 'N':
-          this.WhiteKnight = this.WhiteKnight.xor(oneBit);
+        case 'N': this.WhiteKnight.applyBit(piece);
           break;
-        case 'B':
-          this.WhiteBishop = this.WhiteBishop.xor(oneBit);
+        case 'B': this.WhiteBishop.applyBit(piece);
           break;
-        case 'Q':
-          this.WhiteQueen = this.WhiteQueen.xor(oneBit);
+        case 'Q': this.WhiteQueen.applyBit(piece);
           break;
-        case 'K':
-          this.WhiteKing = this.WhiteKing.xor(oneBit);
+        case 'K': this.WhiteKing.applyBit(piece);
           break;
-        case 'P':
-          this.WhitePawn = this.WhitePawn.xor(oneBit);
+        case 'P': this.WhitePawn.applyBit(piece);
           break;
       }
     }
+  }
+
+  /**
+   *
+   * @description Update our Long object with given values
+   */
+  updateLong(tempLong) {
+    this.low = tempLong.low;
+    this.high = tempLong.high;
+    this.unsigned = tempLong.unsigned;
   }
 }
 

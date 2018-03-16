@@ -3,71 +3,11 @@
 
 const Long = require('long');
 
+import Pieces from './pieces.js';
+
 class Chess {
   constructor() {
-    Long.prototype.applyBit = this.applyBit;
-    Long.prototype.updateLong = this.updateLong;
-    Long.prototype.popBit = this.popBit;
-    Long.prototype.northEastOne = this.northEastOne;
-    Long.prototype.northWestOne = this.northWestOne;
-
-    Long.prototype.northNorthEast = this.northNorthEast;
-    Long.prototype.northNorthWest = this.northNorthWest;
-    Long.prototype.southSouthEast = this.southSouthEast;
-    Long.prototype.southSouthWest = this.southSouthWest;
-    Long.prototype.northEastEast = this.northEastEast;
-    Long.prototype.northWestWest = this.northWestWest;
-    Long.prototype.southEastEast = this.southEastEast;
-    Long.prototype.southWestWest = this.southWestWest;
-
-    Long.prototype.advancePawn = this.advancePawn;
-    Long.prototype.pawnAttack = this.pawnAttack;
-    Long.prototype.knightAttack = this.knightAttack;
-    Long.prototype.colour = 0;
-
-    this.unicode = {
-      whiteKing: 0x2654,
-      whiteQueen: 0x2655,
-      whiteRook: 0x2656,
-      whiteBishop: 0x2657,
-      whiteKnight: 0x2658,
-      whitePawn: 0x2659,
-      blackKing: 0x265a,
-      blackQueen: 0x265b,
-      blackRook: 0x265c,
-      blackBishop: 0x265d,
-      blackKnight: 0x265e,
-      blackPawn: 0x265f,
-    };
-
     this.ply = 0;
-
-    this.BlackRook = new Long(0, 0, true);
-    this.BlackKnight = new Long(0, 0, true);
-    this.BlackBishop = new Long(0, 0, true);
-    this.BlackQueen = new Long(0, 0, true);
-    this.BlackKing = new Long(0, 0, true);
-    this.BlackPawn = new Long(0, 0, true);
-    this.WhiteRook = new Long(0, 0, true);
-    this.WhiteKnight = new Long(0, 0, true);
-    this.WhiteBishop = new Long(0, 0, true);
-    this.WhiteQueen = new Long(0, 0, true);
-    this.WhiteKing = new Long(0, 0, true);
-    this.WhitePawn = new Long(0, 0, true);
-
-    // 1 = black, 0 = white
-    this.BlackRook.colour = 1;
-    this.BlackKnight.colour = 1;
-    this.BlackBishop.colour = 1;
-    this.BlackQueen.colour = 1;
-    this.BlackKing.colour = 1;
-    this.BlackPawn.colour = 1;
-    this.WhiteRook.colour = 0;
-    this.WhiteKnight.colour = 0;
-    this.WhiteBishop.colour = 0;
-    this.WhiteQueen.colour = 0;
-    this.WhiteKing.colour = 0;
-    this.WhitePawn.colour = 0;
 
     // prettier-ignore
     const standardBoard = [
@@ -76,23 +16,12 @@ class Chess {
       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-      ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+      ' ', ' ', 'N', ' ', ' ', ' ', ' ', ' ',
       'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P',
-      'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R',
+      'R', ' ', 'B', 'Q', 'K', 'B', 'N', 'R',
     ];
 
-    // prettier-ignore
-    const aRankArray = [
-      '1', '1', '1', '1', '1', '1', '1', '1',
-      '0', '0', '0', '0', '0', '0', '0', '0',
-      '0', '0', '0', '0', '0', '0', '0', '0',
-      '0', '0', '0', '0', '0', '0', '0', '0',
-      '0', '0', '0', '0', '0', '0', '0', '0',
-      '0', '0', '0', '0', '0', '0', '0', '0',
-      '0', '0', '0', '0', '0', '0', '0', '0',
-      '0', '0', '0', '0', '0', '0', '0', '0',
-    ];
-    //this.aRank = this.arrayToBitboard(aRankArray);
+    this.pieces = new Pieces();
 
     // Build our bitboards
     this.arrayToChessBitboards(standardBoard);
@@ -104,138 +33,87 @@ class Chess {
     this.testing();
   }
 
+  /**
+   *
+   * @description Used during development to test methods
+   */
   testing() {
     //console.log('White Knight Current');
-    //this.printBitboard(this.WhiteKnight);
+    this.printBitboard(this.pieces.WhiteKnight, 'WhiteKnight');
 
-    //let knAttack = this.WhiteKnight.knightAttack(this.empty);
+    //let knAttack = this.pieces.WhiteKnight.knightAttacks(this.empty);
     //console.log('White Knight possible attack');
-    //this.printBitboard(knAttack);
+    //this.printBitboard(knAttack, 'WhiteKnight');
 
-    let poppedIndex;
-    poppedIndex = this.WhitePawn.popBit();
-    this.printBitboard(this.WhitePawn, 'whitePawn');
-    console.log(poppedIndex);
+    //console.log('Black Knight Current');
+    //this.printBitboard(this.pieces.BlackKnight, 'blackKnight');
 
-    poppedIndex = this.WhitePawn.popBit();
-    this.printBitboard(this.WhitePawn, 'whitePawn');
-    console.log(poppedIndex);
+    //let knbAttack = this.pieces.BlackKnight.knightAttacks(this.empty);
+    //console.log('Black Knight possible attack');
+    //this.printBitboard(knbAttack, 'blackKnight');
 
-    //self = this;
-    //Object.keys(this.unicode).forEach(function(key) {
-    //let piece = String.fromCharCode(self.unicode[key]);
-    //console.log(piece);
-    //});
+    let n = 'a5';
+    let piece = this.getChessPiece(n);
+
+    console.log(`${n} - ${piece}`);
   }
 
   /**
-   *
-   * @description Pop the least significant bit
+   * @param {string} Algebraic notation of the board
+   * @returns {string} The type of piece on the given square
    */
-  popBit() {
-    let index;
-    let popped = this.and(new Long(0, 0, true).subtract(this));
+  getChessPiece(notation) {
+    let [file, rank] = notation.split('');
+    file = file.charCodeAt(0) & 15;
+    rank = Number(rank) - 1;
 
-    for (index = 0; !popped.isZero(); index++)
-      popped = popped.shiftRightUnsigned(1);
+    let pieceType = 'empty';
 
-    // Actually pop it
-    this.updateLong(this.and(this.subtract(1)));
+    const flipAH = {
+      1: 7,
+      2: 6,
+      3: 5,
+      4: 4,
+      5: 3,
+      6: 2,
+      7: 1,
+      8: 0,
+    };
 
-    return index;
-  }
+    const index = rank * 8 + flipAH[file];
 
-  knightAttack(empty) {
-    return this.northNorthEast()
-      .or(this.northNorthWest())
-      .or(this.southSouthEast())
-      .or(this.southSouthWest())
-      .or(this.northEastEast())
-      .or(this.northWestWest())
-      .or(this.southEastEast())
-      .or(this.southWestWest())
-      .and(empty);
-  }
+    let bit = new Long(1, 0, true).shiftLeft(index);
 
-  northNorthEast() {
-    const aFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
-    return this.shiftLeft(15).and(aFile);
-  }
-  northNorthWest() {
-    const hFile = new Long(0xfefefefe, 0xfefefefe, true);
-    return this.shiftLeft(17).and(hFile);
-  }
-  southSouthEast() {
-    const aFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
-    return this.shiftRight(17).and(aFile);
-  }
-  southSouthWest() {
-    const hFile = new Long(0xfefefefe, 0xfefefefe, true);
-    return this.shiftRight(15).and(hFile);
-  }
-  northEastEast() {
-    const aFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
-    const bFile = new Long(0xbfbfbfbf, 0xbfbfbf, true);
-    return this.shiftLeft(15)
-      .and(aFile)
-      .and(bFile);
-  }
-  northWestWest() {
-    const hFile = new Long(0xfefefefe, 0xfefefefe, true);
-    const gFile = new Long(0xfdfdfdfd, 0xfdfdfdfd, true);
-    return this.shiftLeft(17)
-      .and(hFile)
-      .and(gFile);
-  }
-  southEastEast() {
-    const aFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
-    const bFile = new Long(0xbfbfbfbf, 0xbfbfbf, true);
-    return this.shiftRight(17)
-      .and(aFile)
-      .and(bFile);
-  }
-  southWestWest() {
-    const hFile = new Long(0xfefefefe, 0xfefefefe, true);
-    const gFile = new Long(0xfdfdfdfd, 0xfdfdfdfd, true);
-    return this.shiftRight(15)
-      .and(hFile)
-      .and(gFile);
+    self = this;
+    const allPieces = [
+      'BlackRook',
+      'BlackKnight',
+      'BlackBishop',
+      'BlackQueen',
+      'BlackKing',
+      'BlackPawn',
+      'WhiteRook',
+      'WhiteKnight',
+      'WhiteBishop',
+      'WhiteQueen',
+      'WhiteKing',
+      'WhitePawn',
+    ];
+
+    allPieces.forEach(function(t) {
+      if (!self.pieces[t].and(bit).isZero()) {
+        pieceType = t;
+        return;
+      }
+    });
+
+    return pieceType;
   }
 
   /**
-   *
-   * @description Advance a pawn bitboard by one row
-   */
-  pawnAttack(empty) {
-    return this.northEastOne()
-      .or(this.northWestOne())
-      .and(empty);
-  }
-
-  /**
-   *
-   * @description Move bitboard northeast by one rank
-   */
-  northEastOne() {
-    const hFile = new Long(0xfefefefe, 0xfefefefe, true);
-    return this.shiftLeft(9)
-      .shiftRightUnsigned(this.colour << 4)
-      .and(hFile);
-  }
-  /**
-   *
-   * @description Move bitboard northwest by one rank
-   */
-  northWestOne() {
-    const aFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
-    return this.shiftLeft(7)
-      .shiftRightUnsigned(this.colour << 4)
-      .and(aFile);
-  }
-
-  /**
-   *
+   * @param {long} bitboard that we count to count the bits of
    * @description Count the number of bits in a given bitboard
+   * @returns {int} number of bits in bitboard
    */
   countBits(bitboard) {
     let count;
@@ -246,47 +124,57 @@ class Chess {
 
   /**
    *
-   * @description Advance a pawn bitboard by one row
-   */
-  advancePawn(empty) {
-    return this.shiftLeft(8)
-      .shiftRightUnsigned(this.colour << 4)
-      .and(empty);
-  }
-
-  /**
-   *
    * @description Produce a bitboard of all empty spaces on the board
    */
   getEmptyBitboard() {
     this.empty = new Long(0, 0)
-      .or(this.BlackRook)
-      .or(this.BlackKnight)
-      .or(this.BlackBishop)
-      .or(this.BlackQueen)
-      .or(this.BlackKing)
-      .or(this.BlackPawn)
-      .or(this.WhiteRook)
-      .or(this.WhiteKnight)
-      .or(this.WhiteBishop)
-      .or(this.WhiteQueen)
-      .or(this.WhiteKing)
-      .or(this.WhitePawn)
+      .or(this.pieces.BlackRook)
+      .or(this.pieces.BlackKnight)
+      .or(this.pieces.BlackBishop)
+      .or(this.pieces.BlackQueen)
+      .or(this.pieces.BlackKing)
+      .or(this.pieces.BlackPawn)
+      .or(this.pieces.WhiteRook)
+      .or(this.pieces.WhiteKnight)
+      .or(this.pieces.WhiteBishop)
+      .or(this.pieces.WhiteQueen)
+      .or(this.pieces.WhiteKing)
+      .or(this.pieces.WhitePawn)
       .not();
   }
 
   /**
-   *
+   * @param {long} bitboard to print to console
+   * @param {string} Chess symbol key for unicode
    * @description Print the given bitboard to the console
    */
   printBitboard(bitboard, unicodeKey) {
+    /**
+     * https://en.wikipedia.org/wiki/Halfwidth_and_fullwidth_forms
+     * https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode
+     */
+    const unicode = {
+      WhiteKing: 0x2654,
+      WhiteQueen: 0x2655,
+      WhiteRook: 0x2656,
+      WhiteBishop: 0x2657,
+      WhiteKnight: 0x2658,
+      WhitePawn: 0x2659,
+      BlackKing: 0x265a,
+      BlackQueen: 0x265b,
+      BlackRook: 0x265c,
+      BlackBishop: 0x265d,
+      BlackKnight: 0x265e,
+      BlackPawn: 0x265f,
+    };
+
     let line = '';
     let i;
     let oneBit;
-    let unicodePiece = String.fromCharCode(this.unicode[unicodeKey]);
-    let unicodeSpace = String.fromCharCode(0x3000);
+    let unicodePiece = String.fromCharCode(unicode[unicodeKey]);
+    let unicodeUnder = String.fromCharCode(0xff3f);
 
-    let board = '';
+    let board = '%c';
 
     for (let y = 8; y--; ) {
       line = `${y + 1} `;
@@ -296,25 +184,19 @@ class Chess {
         oneBit = new Long(1, 0);
         oneBit = oneBit.shiftLeft(i);
         if (bitboard.and(oneBit).toString() != '0') {
-          line += `| ${unicodePiece} `;
+          line += `|_${unicodePiece}_`;
         } else {
-          line += `| ${unicodeSpace} `;
+          line += `|_${unicodeUnder}_`;
         }
       }
       board += `${line}|\n`;
     }
 
-    board += `  + A${unicodeSpace}+ B${unicodeSpace}+ C${unicodeSpace}+ D${unicodeSpace}+ E${unicodeSpace}+ F${unicodeSpace}+ G${unicodeSpace}+ H${unicodeSpace}+\n`;
-    console.log(`${board}\n`);
-  }
-
-  /**
-   *
-   * @description apply a bit on out bitboard
-   */
-  applyBit(bit) {
-    const tempLong = this.xor(bit);
-    this.updateLong(tempLong);
+    board += `  `;
+    for (let i = 0xff21; i <= 0xff28; i++)
+      board += `| ${String.fromCharCode(i)} `;
+    board += `|\n`;
+    console.log(`${board}\n`, 'font-size: 1.3em;');
   }
 
   arrayToBitboard(array) {
@@ -322,67 +204,46 @@ class Chess {
     let bit;
 
     array.reverse();
-
     for (let i = 0; i < array.length; i++) {
       bit = new Long(1, 0, true).shiftLeft(i);
-
-      if (array[i] === '1') {
-        tempLong.applyBit(bit);
-      }
+      if (array[i] === '1') tempLong.applyBit(bit);
     }
 
     return tempLong;
   }
 
   /**
-   *
+   * @param {array} Chess board piece positions
    * @description Build all our bitboards
    */
   arrayToChessBitboards(boardArray) {
     let piece;
+
+    const allPieces = {
+      r: 'BlackRook',
+      n: 'BlackKnight',
+      b: 'BlackBishop',
+      q: 'BlackQueen',
+      k: 'BlackKing',
+      p: 'BlackPawn',
+      R: 'WhiteRook',
+      N: 'WhiteKnight',
+      B: 'WhiteBishop',
+      Q: 'WhiteQueen',
+      K: 'WhiteKing',
+      P: 'WhitePawn',
+    };
+
     boardArray.reverse();
 
     for (let i = 0; i < boardArray.length; i++) {
       piece = new Long(1, 0).shiftLeft(i);
 
-      // prettier-ignore
-      switch (boardArray[i]) {
-        case 'r': this.BlackRook.applyBit(piece);
-          break;
-        case 'n': this.BlackKnight.applyBit(piece);
-          break;
-        case 'b': this.BlackBishop.applyBit(piece);
-          break;
-        case 'q': this.BlackQueen.applyBit(piece);
-          break;
-        case 'k': this.BlackKing.applyBit(piece);
-          break;
-        case 'p': this.BlackPawn.applyBit(piece);
-          break;
-        case 'R': this.WhiteRook.applyBit(piece);
-          break;
-        case 'N': this.WhiteKnight.applyBit(piece);
-          break;
-        case 'B': this.WhiteBishop.applyBit(piece);
-          break;
-        case 'Q': this.WhiteQueen.applyBit(piece);
-          break;
-        case 'K': this.WhiteKing.applyBit(piece);
-          break;
-        case 'P': this.WhitePawn.applyBit(piece);
-          break;
+      if (allPieces[boardArray[i]]) {
+        this.pieces[allPieces[boardArray[i]]].applyBit(piece);
+        continue;
       }
     }
-  }
-
-  /**
-   *
-   * @description Update our Long object with given values
-   */
-  updateLong(tempLong) {
-    this.low = tempLong.low;
-    this.high = tempLong.high;
-    this.unsigned = tempLong.unsigned;
   }
 }
 

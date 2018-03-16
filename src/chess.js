@@ -25,6 +25,21 @@ class Chess {
     Long.prototype.knightAttack = this.knightAttack;
     Long.prototype.colour = 0;
 
+    this.unicode = {
+      whiteKing: 0x2654,
+      whiteQueen: 0x2655,
+      whiteRook: 0x2656,
+      whiteBishop: 0x2657,
+      whiteKnight: 0x2658,
+      whitePawn: 0x2659,
+      blackKing: 0x265a,
+      blackQueen: 0x265b,
+      blackRook: 0x265c,
+      blackBishop: 0x265d,
+      blackKnight: 0x265e,
+      blackPawn: 0x265f,
+    };
+
     this.ply = 0;
 
     this.BlackRook = new Long(0, 0, true);
@@ -90,12 +105,44 @@ class Chess {
   }
 
   testing() {
-    console.log('White Knight Current');
-    this.printBitboard(this.WhiteKnight);
+    //console.log('White Knight Current');
+    //this.printBitboard(this.WhiteKnight);
 
-    let knAttack = this.WhiteKnight.knightAttack(this.empty);
-    console.log('White Knight possible attack');
-    this.printBitboard(knAttack);
+    //let knAttack = this.WhiteKnight.knightAttack(this.empty);
+    //console.log('White Knight possible attack');
+    //this.printBitboard(knAttack);
+
+    let poppedIndex;
+    poppedIndex = this.WhitePawn.popBit();
+    this.printBitboard(this.WhitePawn, 'whitePawn');
+    console.log(poppedIndex);
+
+    poppedIndex = this.WhitePawn.popBit();
+    this.printBitboard(this.WhitePawn, 'whitePawn');
+    console.log(poppedIndex);
+
+    //self = this;
+    //Object.keys(this.unicode).forEach(function(key) {
+    //let piece = String.fromCharCode(self.unicode[key]);
+    //console.log(piece);
+    //});
+  }
+
+  /**
+   *
+   * @description Pop the least significant bit
+   */
+  popBit() {
+    let index;
+    let popped = this.and(new Long(0, 0, true).subtract(this));
+
+    for (index = 0; !popped.isZero(); index++)
+      popped = popped.shiftRightUnsigned(1);
+
+    // Actually pop it
+    this.updateLong(this.and(this.subtract(1)));
+
+    return index;
   }
 
   knightAttack(empty) {
@@ -188,36 +235,11 @@ class Chess {
 
   /**
    *
-   * @description Move a single target forward
-   */
-  //singlePush(bitboard) {
-  //const rank3 = new Long(0x00000000ff000000, 0, true);
-
-  ////rank3.shiftLeft(5);
-
-  //this.printBitboard(rank3);
-  //console.log(rank3.toString());
-  //}
-
-  /**
-   *
-   * [TODO] return the index of the popped bit?
-   * @description Pop the least significant bit
-   */
-  popBit(bitboard) {
-    //x & -x = ls1b-of-x;
-    //x & x-1 = removal of ls1b
-
-    return bitboard.and(bitboard.subtract(1));
-  }
-
-  /**
-   *
    * @description Count the number of bits in a given bitboard
    */
   countBits(bitboard) {
     let count;
-    for (let count = 0; !bitboard.isZero(); count++)
+    for (count = 0; !bitboard.isZero(); count++)
       bitboard = bitboard.and(bitboard.subtract(1));
     return count;
   }
@@ -257,10 +279,12 @@ class Chess {
    *
    * @description Print the given bitboard to the console
    */
-  printBitboard(bitboard) {
+  printBitboard(bitboard, unicodeKey) {
     let line = '';
     let i;
     let oneBit;
+    let unicodePiece = String.fromCharCode(this.unicode[unicodeKey]);
+    let unicodeSpace = String.fromCharCode(0x3000);
 
     let board = '';
 
@@ -272,15 +296,15 @@ class Chess {
         oneBit = new Long(1, 0);
         oneBit = oneBit.shiftLeft(i);
         if (bitboard.and(oneBit).toString() != '0') {
-          line += `| x `;
+          line += `| ${unicodePiece} `;
         } else {
-          line += `|   `;
+          line += `| ${unicodeSpace} `;
         }
       }
       board += `${line}|\n`;
     }
 
-    board += '- + A - B - C - D - E - F - G - H +\n';
+    board += `  + A${unicodeSpace}+ B${unicodeSpace}+ C${unicodeSpace}+ D${unicodeSpace}+ E${unicodeSpace}+ F${unicodeSpace}+ G${unicodeSpace}+ H${unicodeSpace}+\n`;
     console.log(`${board}\n`);
   }
 

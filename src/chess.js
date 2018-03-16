@@ -8,8 +8,21 @@ class Chess {
     Long.prototype.applyBit = this.applyBit;
     Long.prototype.updateLong = this.updateLong;
     Long.prototype.popBit = this.popBit;
+    Long.prototype.northEastOne = this.northEastOne;
+    Long.prototype.northWestOne = this.northWestOne;
+
+    Long.prototype.northNorthEast = this.northNorthEast;
+    Long.prototype.northNorthWest = this.northNorthWest;
+    Long.prototype.southSouthEast = this.southSouthEast;
+    Long.prototype.southSouthWest = this.southSouthWest;
+    Long.prototype.northEastEast = this.northEastEast;
+    Long.prototype.northWestWest = this.northWestWest;
+    Long.prototype.southEastEast = this.southEastEast;
+    Long.prototype.southWestWest = this.southWestWest;
+
     Long.prototype.advancePawn = this.advancePawn;
-    Long.prototype.attackPawn = this.attackPawn;
+    Long.prototype.pawnAttack = this.pawnAttack;
+    Long.prototype.knightAttack = this.knightAttack;
     Long.prototype.colour = 0;
 
     this.ply = 0;
@@ -54,18 +67,17 @@ class Chess {
     ];
 
     // prettier-ignore
-    const examplePawnArray = [
+    const aRankArray = [
+      '1', '1', '1', '1', '1', '1', '1', '1',
       '0', '0', '0', '0', '0', '0', '0', '0',
       '0', '0', '0', '0', '0', '0', '0', '0',
       '0', '0', '0', '0', '0', '0', '0', '0',
       '0', '0', '0', '0', '0', '0', '0', '0',
       '0', '0', '0', '0', '0', '0', '0', '0',
-      '0', '0', '1', '0', '0', '0', '0', '0',
-      '1', '1', '0', '1', '0', '1', '1', '1',
+      '0', '0', '0', '0', '0', '0', '0', '0',
       '0', '0', '0', '0', '0', '0', '0', '0',
     ];
-
-    this.examplePawn = this.arrayToBitboard(examplePawnArray);
+    //this.aRank = this.arrayToBitboard(aRankArray);
 
     // Build our bitboards
     this.arrayToChessBitboards(standardBoard);
@@ -78,68 +90,100 @@ class Chess {
   }
 
   testing() {
-    //console.log(typeof this.WhitePawn);
-    //this.WhitePawn = this.popBit(this.WhitePawn);
-    //this.printBitboard(this.WhitePawn);
+    console.log('White Knight Current');
+    this.printBitboard(this.WhiteKnight);
 
-    //console.log(this.countBits(this.WhitePawn));
-    //console.log(this.countBits(this.BlackRook));
-    //this.printBitboard(this.empty);
+    let knAttack = this.WhiteKnight.knightAttack(this.empty);
+    console.log('White Knight possible attack');
+    this.printBitboard(knAttack);
+  }
 
-    //console.log('White Pawn Advance 1');
-    //this.printBitboard(this.WhitePawn);
-    //this.WhitePawn.advancePawn(this.empty);
-    //this.printBitboard(this.WhitePawn);
+  knightAttack(empty) {
+    return this.northNorthEast()
+      .or(this.northNorthWest())
+      .or(this.southSouthEast())
+      .or(this.southSouthWest())
+      .or(this.northEastEast())
+      .or(this.northWestWest())
+      .or(this.southEastEast())
+      .or(this.southWestWest())
+      .and(empty);
+  }
 
-    //let possibleBlackPawnMoves = this.BlackPawn.advancePawn(this.empty);
-    //console.log('Black Pawn Current');
-    //this.printBitboard(this.BlackPawn);
-    //console.log('Black Pawn Advance 1');
-    //this.printBitboard(possibleBlackPawnMoves);
-
-    //let possibleWhitePawnMoves = this.WhitePawn.advancePawn(this.empty);
-    //console.log('White Pawn Current');
-    //this.printBitboard(this.WhitePawn);
-    //console.log('White Pawn Advance 1');
-    //this.printBitboard(possibleWhitePawnMoves);
-    //
-
-    //console.log('White Pawn Current');
-    //this.printBitboard(this.WhitePawn);
-
-    //let pwAttack = this.WhitePawn.attackPawn(this.empty);
-    //console.log('White Pawn Attack');
-    //this.printBitboard(pwAttack);
-
-    console.log('cpw example pawns');
-    this.printBitboard(this.examplePawn);
-
-    let pwAttack = this.examplePawn.attackPawn(this.empty);
-    console.log('cpw example all attacks');
-    this.printBitboard(pwAttack);
-
-    //this.singlePush(this.WhitePawn);
+  northNorthEast() {
+    const aFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
+    return this.shiftLeft(15).and(aFile);
+  }
+  northNorthWest() {
+    const hFile = new Long(0xfefefefe, 0xfefefefe, true);
+    return this.shiftLeft(17).and(hFile);
+  }
+  southSouthEast() {
+    const aFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
+    return this.shiftRight(17).and(aFile);
+  }
+  southSouthWest() {
+    const hFile = new Long(0xfefefefe, 0xfefefefe, true);
+    return this.shiftRight(15).and(hFile);
+  }
+  northEastEast() {
+    const aFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
+    const bFile = new Long(0xbfbfbfbf, 0xbfbfbf, true);
+    return this.shiftLeft(15)
+      .and(aFile)
+      .and(bFile);
+  }
+  northWestWest() {
+    const hFile = new Long(0xfefefefe, 0xfefefefe, true);
+    const gFile = new Long(0xfdfdfdfd, 0xfdfdfdfd, true);
+    return this.shiftLeft(17)
+      .and(hFile)
+      .and(gFile);
+  }
+  southEastEast() {
+    const aFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
+    const bFile = new Long(0xbfbfbfbf, 0xbfbfbf, true);
+    return this.shiftRight(17)
+      .and(aFile)
+      .and(bFile);
+  }
+  southWestWest() {
+    const hFile = new Long(0xfefefefe, 0xfefefefe, true);
+    const gFile = new Long(0xfdfdfdfd, 0xfdfdfdfd, true);
+    return this.shiftRight(15)
+      .and(hFile)
+      .and(gFile);
   }
 
   /**
    *
    * @description Advance a pawn bitboard by one row
    */
-  attackPawn(empty) {
-    const notAFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
-    const notHFile = new Long(0xfefefefe, 0xfefefefe, true);
+  pawnAttack(empty) {
+    return this.northEastOne()
+      .or(this.northWestOne())
+      .and(empty);
+  }
 
-    const east = this.shiftLeft(9)
+  /**
+   *
+   * @description Move bitboard northeast by one rank
+   */
+  northEastOne() {
+    const hFile = new Long(0xfefefefe, 0xfefefefe, true);
+    return this.shiftLeft(9)
       .shiftRightUnsigned(this.colour << 4)
-      .and(empty)
-      .and(notHFile);
-
-    const west = this.shiftLeft(7)
+      .and(hFile);
+  }
+  /**
+   *
+   * @description Move bitboard northwest by one rank
+   */
+  northWestOne() {
+    const aFile = new Long(0x7f7f7f7f, 0x7f7f7f7f, true);
+    return this.shiftLeft(7)
       .shiftRightUnsigned(this.colour << 4)
-      .and(empty)
-      .and(notAFile);
-
-    return east.or(west);
+      .and(aFile);
   }
 
   /**
@@ -161,6 +205,9 @@ class Chess {
    * @description Pop the least significant bit
    */
   popBit(bitboard) {
+    //x & -x = ls1b-of-x;
+    //x & x-1 = removal of ls1b
+
     return bitboard.and(bitboard.subtract(1));
   }
 

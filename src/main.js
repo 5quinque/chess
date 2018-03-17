@@ -2,5 +2,7 @@
 'use strict';
 
 import Chess from './chess.js';
+import Interface from './interface.js';
 
-var chess = new Chess();
+let chess = new Chess();
+let chessUI = new Interface(chess);

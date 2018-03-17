@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="270" height="90">
-    <view id="white-king" viewBox="0 0 45 45"></view>
-    <view id="white-queen" viewBox="45 0 45 45"></view>
-    <view id="white-bishop" viewBox="90 0 45 45"></view>
-    <view id="white-knight" viewBox="135 0 45 45"></view>
-    <view id="white-rook" viewBox="180 0 45 45"></view>
-    <view id="white-pawn" viewBox="225 0 45 45"></view>
+    <view id="WhiteKing" viewBox="0 0 45 45"></view>
+    <view id="WhiteQueen" viewBox="45 0 45 45"></view>
+    <view id="WhiteBishop" viewBox="90 0 45 45"></view>
+    <view id="WhiteKnight" viewBox="135 0 45 45"></view>
+    <view id="WhiteRook" viewBox="180 0 45 45"></view>
+    <view id="WhitePawn" viewBox="225 0 45 45"></view>
 
-    <view id="black-king" viewBox="0 45 45 45"></view>
-    <view id="black-queen" viewBox="45 45 45 45"></view>
-    <view id="black-bishop" viewBox="90 45 45 45"></view>
-    <view id="black-knight" viewBox="135 45 45 45"></view>
-    <view id="black-rook" viewBox="180 45 45 45"></view>
-    <view id="black-pawn" viewBox="225 45 45 45"></view>
+    <view id="BlackKing" viewBox="0 45 45 45"></view>
+    <view id="BlackQueen" viewBox="45 45 45 45"></view>
+    <view id="BlackBishop" viewBox="90 45 45 45"></view>
+    <view id="BlackKnight" viewBox="135 45 45 45"></view>
+    <view id="BlackRook" viewBox="180 45 45 45"></view>
+    <view id="BlackPawn" viewBox="225 45 45 45"></view>
     <!-- white king //-->
     <g style="fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;" transform="translate(0,0)">
         <path

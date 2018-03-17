@@ -12,13 +12,13 @@ class Chess {
     // prettier-ignore
     const standardBoard = [
       'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r',
-      'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p',
+      ' ', 'p', 'p', 'p', 'p', 'p', 'p', 'p',
       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-      ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-      ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-      ' ', ' ', 'N', ' ', ' ', ' ', ' ', ' ',
-      'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P',
-      'R', ' ', 'B', 'Q', 'K', 'B', 'N', 'R',
+      'p', ' ', ' ', 'B', ' ', ' ', ' ', ' ',
+      ' ', 'P', ' ', ' ', ' ', ' ', ' ', ' ',
+      ' ', ' ', 'P', ' ', ' ', ' ', ' ', 'N',
+      'P', ' ', ' ', 'P', 'P', 'P', 'P', 'P',
+      'R', 'N', ' ', 'Q', 'K', 'B', ' ', 'R',
     ];
 
     this.pieces = new Pieces();
@@ -38,24 +38,20 @@ class Chess {
    * @description Used during development to test methods
    */
   testing() {
+    //this.printChessboard();
     //console.log('White Knight Current');
-    this.printBitboard(this.pieces.WhiteKnight, 'WhiteKnight');
-
+    //this.printBitboard(this.pieces.WhiteKnight, 'WhiteKnight');
     //let knAttack = this.pieces.WhiteKnight.knightAttacks(this.empty);
     //console.log('White Knight possible attack');
     //this.printBitboard(knAttack, 'WhiteKnight');
-
     //console.log('Black Knight Current');
     //this.printBitboard(this.pieces.BlackKnight, 'blackKnight');
-
     //let knbAttack = this.pieces.BlackKnight.knightAttacks(this.empty);
     //console.log('Black Knight possible attack');
-    //this.printBitboard(knbAttack, 'blackKnight');
-
-    let n = 'a5';
-    let piece = this.getChessPiece(n);
-
-    console.log(`${n} - ${piece}`);
+    //this.printBitboard(knbAttack, 'BlackKnight');
+    //let n = 'a5';
+    //let piece = this.getChessPiece(n);
+    //console.log(`${n} - ${piece}`);
   }
 
   /**
@@ -144,6 +140,113 @@ class Chess {
   }
 
   /**
+   * @description Print the whole chessboard to the console
+   */
+  getChessboardObj() {
+    const unicode = {
+      WhiteKing: 0x2654,
+      WhiteQueen: 0x2655,
+      WhiteRook: 0x2656,
+      WhiteBishop: 0x2657,
+      WhiteKnight: 0x2658,
+      WhitePawn: 0x2659,
+      BlackKing: 0x265a,
+      BlackQueen: 0x265b,
+      BlackRook: 0x265c,
+      BlackBishop: 0x265d,
+      BlackKnight: 0x265e,
+      BlackPawn: 0x265f,
+    };
+
+    let boardObj = {};
+
+    self = this;
+    let i;
+    let oneBit;
+
+    Object.keys(unicode).forEach(function(type) {
+      for (let y = 8; y--; ) {
+        for (let x = 8; x--; ) {
+          i = y * 8 + x;
+
+          oneBit = new Long(1, 0);
+          oneBit = oneBit.shiftLeft(i);
+          if (self.pieces[type].and(oneBit).toString() != '0')
+            boardObj[i] = type;
+        }
+      }
+    });
+    return boardObj;
+  }
+
+  /**
+   * @description Print the whole chessboard to the console
+   */
+  printChessboard() {
+    const unicode = {
+      WhiteKing: 0x2654,
+      WhiteQueen: 0x2655,
+      WhiteRook: 0x2656,
+      WhiteBishop: 0x2657,
+      WhiteKnight: 0x2658,
+      WhitePawn: 0x2659,
+      BlackKing: 0x265a,
+      BlackQueen: 0x265b,
+      BlackRook: 0x265c,
+      BlackBishop: 0x265d,
+      BlackKnight: 0x265e,
+      BlackPawn: 0x265f,
+    };
+
+    let boardObj = {};
+
+    self = this;
+    let i;
+    let oneBit;
+
+    Object.keys(unicode).forEach(function(type) {
+      for (let y = 8; y--; ) {
+        for (let x = 8; x--; ) {
+          i = y * 8 + x;
+
+          oneBit = new Long(1, 0);
+          oneBit = oneBit.shiftLeft(i);
+          if (self.pieces[type].and(oneBit).toString() != '0')
+            boardObj[i] = type;
+        }
+      }
+    });
+
+    let board = '';
+    let line = '';
+    let unicodePiece;
+    let unicodeUnder = String.fromCharCode(0xff3f);
+    for (let y = 8; y--; ) {
+      line = `${y + 1} `;
+      for (let x = 8; x--; ) {
+        i = y * 8 + x;
+
+        if (!boardObj[i]) {
+          line += `|_${unicodeUnder}_`;
+          continue;
+        }
+
+        unicodePiece = String.fromCharCode(unicode[boardObj[i]]);
+        line += `|_${unicodePiece}_`;
+      }
+      board += `${line}|\n`;
+    }
+
+    board += `  `;
+    for (let i = 0xff21; i <= 0xff28; i++)
+      board += `| ${String.fromCharCode(i)} `;
+    board += `|\n`;
+    console.log(`${board}\n`);
+
+    return;
+  }
+
+  /**
    * @param {long} bitboard to print to console
    * @param {string} Chess symbol key for unicode
    * @description Print the given bitboard to the console
@@ -174,7 +277,7 @@ class Chess {
     let unicodePiece = String.fromCharCode(unicode[unicodeKey]);
     let unicodeUnder = String.fromCharCode(0xff3f);
 
-    let board = '%c';
+    let board = '';
 
     for (let y = 8; y--; ) {
       line = `${y + 1} `;
@@ -196,7 +299,7 @@ class Chess {
     for (let i = 0xff21; i <= 0xff28; i++)
       board += `| ${String.fromCharCode(i)} `;
     board += `|\n`;
-    console.log(`${board}\n`, 'font-size: 1.3em;');
+    console.log(`${board}\n`);
   }
 
   arrayToBitboard(array) {

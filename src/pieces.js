@@ -22,6 +22,7 @@ class Pieces {
 
     Long.prototype.advancePawn = this.advancePawn;
     Long.prototype.pawnAttacks = this.pawnAttacks;
+    Long.prototype.knightMoves = this.knightMoves;
     Long.prototype.knightAttacks = this.knightAttacks;
     Long.prototype.colour = 0;
 
@@ -89,17 +90,23 @@ class Pieces {
     return index;
   }
 
-  knightAttacks(empty) {
-    let oneEast = this.northNorthEast().or(this.southSouthEast());
-    let oneWest = this.northNorthWest().or(this.southSouthWest());
-    let twoEast = this.northEastEast().or(this.southEastEast());
-    let twoWest = this.northWestWest().or(this.southWestWest());
+  knightMoves(teamPieces) {
+    const oneEast = this.northNorthEast().or(this.southSouthEast());
+    const oneWest = this.northNorthWest().or(this.southSouthWest());
+    const twoEast = this.northEastEast().or(this.southEastEast());
+    const twoWest = this.northWestWest().or(this.southWestWest());
 
     return oneEast
       .or(oneWest)
       .or(twoEast)
       .or(twoWest)
-      .and(empty);
+      .and(teamPieces.not());
+  }
+
+  knightAttacks(teamPieces, opponentPieces) {
+    const moves = this.knightMoves(teamPieces);
+
+    return moves.and(opponentPieces);
   }
 
   northNorthEast() {

@@ -9,35 +9,12 @@ body {
 }
 
 .wrapper {
-  display: grid;
-  grid-gap: 4px;
-  grid-template-columns: 480px 200px;
-  width: 685px;
   margin-top: 10px;
   margin: auto;
 }
 
-.move-list {
-  background-color: #8395a7;
-  font-size: 1.3rem;
-  font-weight: 600;
-  border-radius: 0px 4px 4px 0px;
-  height: 484px;
-  overflow-y: scroll;
-}
-
 .future {
   opacity: 0.3;
-}
-
-.notation {
-  background-color: #c8d6e5;
-  text-align: center;
-  color: #222f3e;
-}
-
-.notation:nth-child(odd) {
-  background-color: #8395a7;
 }
 
 .chessboard {
@@ -51,6 +28,7 @@ body {
   width: 480px;
   margin: auto;
 }
+
 div.chessboard div {
   border-radius: 4px;
   line-height: 40px;
@@ -68,7 +46,6 @@ div.chessboard div:nth-child(16n+11),
 div.chessboard div:nth-child(16n+13),
 div.chessboard div:nth-child(16n+15),
 div.chessboard div:nth-child(16n) {
-  //background-color: #2f3542;
   background-color: #57606f;
   color: #2c2c54;
 }
@@ -86,41 +63,7 @@ div.chessboard div:nth-child(16n) {
   color: #2c2c54;
 }
 
-.button_grp {
-  display: grid;
-  grid-template-columns: [col] auto [col] auto;
-  grid-template-rows: [row] auto;
-  grid-gap: 5px;
-  margin: auto;
-  width: 480px;
-  background-color: #57606f;
-  padding: 0 2px 2px;
-  border-radius: 0 0 4px 4px;
-}
-.btn-new, .btn-solve {
-  display: block;
-  margin: 0px 0;
-  padding: 10px;
-  width: 100%;
-  font-weight: 700;
-  font-size: 1.1em;
-  color: #f1f2f6;
-  background-color: #747d8c;
-  box-shadow: 0;
-  border: 0;
-  border-radius: 3px;
-  cursor: pointer;
-}
-.btn-new:hover, .btn-solve:hover {
-  background-color: #a4b0be;
-}
-.item {
-  grid-row: row;
-  text-align: center;
-}
-.item-a {
-  grid-column: col / span 1;
-}
-.item-b {
-  grid-column: col 2 / span 1;
+.possible {
+  box-shadow: inset 0 0 10px 2px #f0f,inset 0 0 5px 3px #0ff;
+  z-index: 100;
 }

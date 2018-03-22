@@ -49,28 +49,6 @@ class Chess {
     this.testing();
   }
 
-  receiveCommand(command) {
-    command = command.replace('\n', '');
-    console.log(`Engine Received Command: ${command}`);
-
-    switch (command) {
-      case 'uci':
-        this.sendCommand('id name RCE 0.1\n');
-        this.sendCommand('id author Ryan Linnit\n');
-        this.sendCommand(
-          'option name Hash type spin default 1 min 1 max 128\n',
-        );
-        this.sendCommand('uciok');
-        break;
-      case 'setoption':
-        break;
-    }
-  }
-
-  sendCommand(command) {
-    this.interface.receiveCommand(`${command}\n`);
-  }
-
   setChessInterface(uinterface) {
     this.interface = uinterface;
   }
